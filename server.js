@@ -7,7 +7,12 @@ var request = require('request');
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// config
 const port = process.env.PORT || 8000;
+
+
+// utils
+////////
 
 function msg(channel, text, callback) {
   var hookURL = process.env.SLACK_INCOMING_WEBHOOK;
@@ -31,6 +36,14 @@ function msg(channel, text, callback) {
   )
 }
 
+
+// routes
+/////////
+
+// LMGTFY
+//
+// A specialized incoming webhook for dealing with custom slash commands.
+// https://api.slack.com/slash-commands
 app.post('/lmgtfy', upload.array(), (req, res) => {
   console.log(req.body);
   // token, team_id, channel_id, channel_name, user_id, team_domain, user_name, command, text
@@ -43,6 +56,7 @@ app.post('/lmgtfy', upload.array(), (req, res) => {
     var text = `${req.body.user_name} suggests: <${base}${encodeURI(req.body.text)}|${req.body.text}>`;
   }
   msg(req.body.channel_id, text)
+  // TODO if there's a warning, send it back to the user
   res.send();
 });
 
@@ -51,5 +65,5 @@ var server = app.listen(port, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  console.log('Example app listening at http://%s:%s', host, port);
+  console.log('App listening at http://%s:%s', host, port);
 });
